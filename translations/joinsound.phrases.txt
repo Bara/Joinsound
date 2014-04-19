@@ -2,14 +2,14 @@
 {
 	"JoinStop"
 	{
-		"en"		"{green}[JoinSound] {lightgreen}with {green}!stop {lightgreen}you can stop the Joinsound."
-		"de"		"{green}[JoinSound] {lightgreen}mit {green}!stop {lightgreen}kannst du den Joinsound stoppen."
+		"en"		"{green}[JoinSound] {lightgreen}Use {green}!stop {lightgreen}to stop playing the joinsound."
+		"de"		"{green}[JoinSound] {lightgreen}Mit {green}!stop {lightgreen}kannst Du den Join-Sound stoppen."
 	}
 	
 	"AdminJoin"
 	{
 		"#format"	"{1:N}"
-		"en"		"{green}[Admin] {orange}{1} {lightgreen}joined the Game!
+		"en"		"{green}[Admin] {orange}{1} {lightgreen}joined the game!
 		"de"		"{green}[Admin] {orange}{1} {lightgreen}betritt das Spiel!
 	}
 }
