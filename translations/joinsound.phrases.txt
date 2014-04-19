@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"JoinStop"
+	{
+		"en"		"{green}[JoinSound] {lightgreen}with {green}!stop {lightgreen}you can stop the Joinsound."
+		"de"		"{green}[JoinSound] {lightgreen}mit {green}!stop {lightgreen}kannst du den Joinsound stoppen."
+	}
+	
+	"AdminJoin"
+	{
+		"#format"	"{1:N}"
+		"en"		"{green}[Admin] {orange}{1} {lightgreen}joined the Game!
+		"de"		"{green}[Admin] {orange}{1} {lightgreen}betritt das Spiel!
+	}
+}

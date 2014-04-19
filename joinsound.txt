@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		
+		"Notes"	"Initial release"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/joinsound.smx"
+		"Source"	"Path_SM/scripting/joinsound.sp"
+		"Source"	"Path_SM/translations/joinsound.phrases.txt"
+	}
+}
