@@ -2,8 +2,9 @@
 {
 	"JoinStop"
 	{
-		"en"		"{green}[JoinSound] {lightgreen}Use {green}!stop {lightgreen}to stop playing the joinsound."
-		"de"		"{green}[JoinSound] {lightgreen}Mit {green}!stop {lightgreen}kannst Du den Join-Sound stoppen."
+		"#format"	"{1:s}"
+		"en"		"{green}[JoinSound] {lightgreen}Use {green}!{1} {lightgreen}to stop playing the joinsound."
+		"de"		"{green}[JoinSound] {lightgreen}Mit {green}!{1} {lightgreen}kannst Du den Join-Sound stoppen."
 	}
 	
 	"AdminJoin"

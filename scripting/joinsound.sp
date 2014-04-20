@@ -9,13 +9,17 @@
 #include <updater>
 
 #define MAX_FILE_LEN 80
-#define JOINSOUND_VERSION "1.0.0"
+#define JOINSOUND_VERSION "1.0.1"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
 new Handle:g_hJoinSoundPath = INVALID_HANDLE;
 new Handle:g_hJoinSoundStart = INVALID_HANDLE;
+new Handle:g_hJoinSoundStartCommand = INVALID_HANDLE;
+new String:g_sJoinSoundStartCommand[32];
 new Handle:g_hJoinSoundStop = INVALID_HANDLE;
+new Handle:g_hJoinSoundStopCommand = INVALID_HANDLE;
+new String:g_sJoinSoundStopCommand[32];
 new Handle:g_hJoinSoundVolume = INVALID_HANDLE;
 new String:g_hJoinSoundName[MAX_FILE_LEN];
 
@@ -47,7 +51,9 @@ public OnPluginStart()
 	g_hJoinSoundEnable = AutoExecConfig_CreateConVar("joinsound_enable", "1", "Enable joinsound?", _, true, 0.0, true, 1.0);
 	g_hJoinSoundPath = AutoExecConfig_CreateConVar("joinsound_path", "newsongformyserver/joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (JoinSound)");
 	g_hJoinSoundStart = AutoExecConfig_CreateConVar("joinsound_start", "1", "Should '!start'-feature be enabled?", _, true, 0.0, true, 1.0);
+	g_hJoinSoundStartCommand = AutoExecConfig_CreateConVar("joinsound_start_command", "start", "Command for start function");
 	g_hJoinSoundStop = AutoExecConfig_CreateConVar("joinsound_stop", "1", "Should '!stop'-feature be enabled?", _, true, 0.0, true, 1.0);
+	g_hJoinSoundStopCommand = AutoExecConfig_CreateConVar("joinsound_stop_command", "stop", "Command for stop function");
 	g_hJoinSoundVolume = AutoExecConfig_CreateConVar("joinsound_volume", "1.0", "Volume of joinsound (1 = default)");
 
 	g_hAdminJoinSoundEnable = AutoExecConfig_CreateConVar("admin_joinsound_enable", "1", "Enable admin joinsound?", _, true, 0.0, true, 1.0);
@@ -94,12 +100,22 @@ public OnConfigsExecuted()
 
 	if(GetConVarInt(g_hJoinSoundStart))
 	{
-		RegConsoleCmd("sm_start", Command_StartSound);
+		decl String:sBuffer[32];
+
+		GetConVarString(g_hJoinSoundStartCommand, g_sJoinSoundStartCommand, sizeof(g_sJoinSoundStartCommand));
+		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStartCommand);
+
+		RegConsoleCmd(sBuffer, Command_StartSound);
 	}
 
 	if(GetConVarInt(g_hJoinSoundStop))
 	{
-		RegConsoleCmd("sm_stop", Command_StopSound);
+		decl String:sBuffer[32];
+
+		GetConVarString(g_hJoinSoundStopCommand, g_sJoinSoundStopCommand, sizeof(g_sJoinSoundStopCommand));
+		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStopCommand);
+
+		RegConsoleCmd(sBuffer, Command_StopSound);
 	}
 }
 
@@ -131,7 +147,7 @@ public OnClientPostAdminCheck(client)
 
 public Action:Timer_Message(Handle:timer, any:client)
 {
-	CPrintToChat(client, "%t", "JoinStop");
+	CPrintToChat(client, "%t", "JoinStop", g_sJoinSoundStopCommand);
 }
 
 public Action:Command_StopSound(client, args)
