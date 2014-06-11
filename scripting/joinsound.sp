@@ -9,7 +9,7 @@
 #include <updater>
 
 #define MAX_FILE_LEN 80
-#define JOINSOUND_VERSION "1.0.1"
+#define JOINSOUND_VERSION "1.0.2"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
@@ -83,19 +83,21 @@ public OnConfigsExecuted()
 	if(GetConVarInt(g_hJoinSoundEnable))
 	{
 		GetConVarString(g_hJoinSoundPath, g_hJoinSoundName, MAX_FILE_LEN);
-		decl String:buffer[MAX_FILE_LEN];
 		PrecacheSound(g_hJoinSoundName, true);
-		Format(buffer, sizeof(buffer), "sound/%s", g_hJoinSoundName);
-		AddFileToDownloadsTable(buffer);
+
+		decl String:sBuffer[MAX_FILE_LEN];
+		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_hJoinSoundName);
+		AddFileToDownloadsTable(sBuffer);
 	}
 
 	if(GetConVarInt(g_hAdminJoinSoundEnable))
 	{
 		GetConVarString(g_hAdminJoinSoundPath, g_hAdminJoinSoundName, MAX_FILE_LEN);
-		decl String:AdminBuffer[MAX_FILE_LEN];
 		PrecacheSound(g_hAdminJoinSoundName, true);
-		Format(AdminBuffer, sizeof(AdminBuffer), "sound/%s", g_hAdminJoinSoundName);
-		AddFileToDownloadsTable(AdminBuffer);
+
+		decl String:sBuffer[MAX_FILE_LEN];
+		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_hAdminJoinSoundName);
+		AddFileToDownloadsTable(sBuffer);
 	}
 
 	if(GetConVarInt(g_hJoinSoundStart))
@@ -104,7 +106,6 @@ public OnConfigsExecuted()
 
 		GetConVarString(g_hJoinSoundStartCommand, g_sJoinSoundStartCommand, sizeof(g_sJoinSoundStartCommand));
 		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStartCommand);
-
 		RegConsoleCmd(sBuffer, Command_StartSound);
 	}
 
@@ -114,7 +115,6 @@ public OnConfigsExecuted()
 
 		GetConVarString(g_hJoinSoundStopCommand, g_sJoinSoundStopCommand, sizeof(g_sJoinSoundStopCommand));
 		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStopCommand);
-
 		RegConsoleCmd(sBuffer, Command_StopSound);
 	}
 }
@@ -126,7 +126,6 @@ public OnClientPostAdminCheck(client)
 		if(IsClientValid(client))
 		{
 			EmitSoundToClient(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
-			
 			CreateTimer(5.0, Timer_Message, client);
 		}
 	}
@@ -136,10 +135,15 @@ public OnClientPostAdminCheck(client)
 		if(IsClientValid(client) && GetUserAdmin(client) != INVALID_ADMIN_ID)
 		{
 			EmitSoundToAll(g_hAdminJoinSoundName, _, _, _, _, GetConVarFloat(g_hAdminJoinSoundVolume));
-			
 			if(GetConVarInt(g_hAdminJoinSoundChatEnable))
 			{
-				CPrintToChatAll("%t", "AdminJoin");
+				for( new i = 1; i <= MaxClients; i++)
+				{
+					if(IsClientValid(i))
+					{
+						CPrintToChat(i, "%T", "AdminJoin", i);
+					}
+				}
 			}
 		}
 	}
@@ -147,35 +151,31 @@ public OnClientPostAdminCheck(client)
 
 public Action:Timer_Message(Handle:timer, any:client)
 {
-	CPrintToChat(client, "%t", "JoinStop", g_sJoinSoundStopCommand);
+	if(IsClientValid(client))
+	{
+		CPrintToChat(client, "%T", "JoinStop", client, g_sJoinSoundStopCommand);
+	}
 }
 
 public Action:Command_StopSound(client, args)
 {
-	if(GetConVarInt(g_hJoinSoundEnable))
+	if(GetConVarInt(g_hJoinSoundEnable) && GetConVarInt(g_hJoinSoundStop))
 	{
-		if(GetConVarInt(g_hJoinSoundStop))
+		if(IsClientValid(client))
 		{
-			if(IsClientValid(client))
-			{
-				StopSound(client, SNDCHAN_AUTO, g_hJoinSoundName);
-			}
+			StopSound(client, SNDCHAN_AUTO, g_hJoinSoundName);
 		}
 	}
 }
 
 public Action:Command_StartSound(client, args)
 {
-	if(GetConVarInt(g_hJoinSoundEnable))
+	if(GetConVarInt(g_hJoinSoundEnable) && GetConVarInt(g_hJoinSoundStart))
 	{
-		if(GetConVarInt(g_hJoinSoundStart))
+		if(IsClientValid(client))
 		{
-			if(IsClientValid(client))
-			{
-				EmitSoundToClient(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
-				
-				CreateTimer(5.0, Timer_Message, client);
-			}
+			EmitSoundToClient(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
+			CreateTimer(5.0, Timer_Message, client);
 		}
 	}
 }
