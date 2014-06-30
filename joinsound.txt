@@ -4,16 +4,17 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.1"
+			"Latest"	"1.0.2"
 		}
 		
-		"Notes"	"Added 2 new cvars to set custom commands for start and stop function"
+		"Notes"	"Fix error ( client invalid )"
 	}
 	
 	"Files"
 	{
 		"Plugin"	"Path_SM/plugins/joinsound.smx"
+		"Plugin"	"Path_SM/translations/joinsound.phrases.txt"
+		
 		"Source"	"Path_SM/scripting/joinsound.sp"
-		"Source"	"Path_SM/translations/joinsound.phrases.txt"
 	}
 }
