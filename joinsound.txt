@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.2"
+			"Latest"	"1.0.3"
 		}
 		
-		"Notes"	"Fix error ( client invalid )"
+		"Notes"	"Added EmitSoundAny ( Thanks to Powerlord )"
 	}
 	
 	"Files"

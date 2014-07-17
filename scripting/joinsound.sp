@@ -3,13 +3,13 @@
 #include <sourcemod>
 #include <sdktools>
 #include <colors>
+#include <emitsoundany>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define MAX_FILE_LEN 80
-#define JOINSOUND_VERSION "1.0.2"
+#define JOINSOUND_VERSION "1.0.3"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
@@ -21,13 +21,13 @@ new Handle:g_hJoinSoundStop = INVALID_HANDLE;
 new Handle:g_hJoinSoundStopCommand = INVALID_HANDLE;
 new String:g_sJoinSoundStopCommand[32];
 new Handle:g_hJoinSoundVolume = INVALID_HANDLE;
-new String:g_hJoinSoundName[MAX_FILE_LEN];
+new String:g_hJoinSoundName[PLATFORM_MAX_PATH];
 
 new Handle:g_hAdminJoinSoundEnable = INVALID_HANDLE;
 new Handle:g_hAdminJoinSoundChatEnable = INVALID_HANDLE;
 new Handle:g_hAdminJoinSoundPath = INVALID_HANDLE;
 new Handle:g_hAdminJoinSoundVolume = INVALID_HANDLE;
-new String:g_hAdminJoinSoundName[MAX_FILE_LEN];
+new String:g_hAdminJoinSoundName[PLATFORM_MAX_PATH];
 
 
 public Plugin:myinfo = 
@@ -82,20 +82,20 @@ public OnConfigsExecuted()
 {
 	if(GetConVarInt(g_hJoinSoundEnable))
 	{
-		GetConVarString(g_hJoinSoundPath, g_hJoinSoundName, MAX_FILE_LEN);
-		PrecacheSound(g_hJoinSoundName, true);
+		GetConVarString(g_hJoinSoundPath, g_hJoinSoundName, PLATFORM_MAX_PATH);
+		PrecacheSoundAny(g_hJoinSoundName, true);
 
-		decl String:sBuffer[MAX_FILE_LEN];
+		decl String:sBuffer[PLATFORM_MAX_PATH];
 		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_hJoinSoundName);
 		AddFileToDownloadsTable(sBuffer);
 	}
 
 	if(GetConVarInt(g_hAdminJoinSoundEnable))
 	{
-		GetConVarString(g_hAdminJoinSoundPath, g_hAdminJoinSoundName, MAX_FILE_LEN);
-		PrecacheSound(g_hAdminJoinSoundName, true);
+		GetConVarString(g_hAdminJoinSoundPath, g_hAdminJoinSoundName, PLATFORM_MAX_PATH);
+		PrecacheSoundAny(g_hAdminJoinSoundName, true);
 
-		decl String:sBuffer[MAX_FILE_LEN];
+		decl String:sBuffer[PLATFORM_MAX_PATH];
 		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_hAdminJoinSoundName);
 		AddFileToDownloadsTable(sBuffer);
 	}
@@ -125,7 +125,7 @@ public OnClientPostAdminCheck(client)
 	{
 		if(IsClientValid(client))
 		{
-			EmitSoundToClient(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
+			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
 			CreateTimer(5.0, Timer_Message, client);
 		}
 	}
@@ -134,7 +134,7 @@ public OnClientPostAdminCheck(client)
 	{
 		if(IsClientValid(client) && GetUserAdmin(client) != INVALID_ADMIN_ID)
 		{
-			EmitSoundToAll(g_hAdminJoinSoundName, _, _, _, _, GetConVarFloat(g_hAdminJoinSoundVolume));
+			EmitSoundToAllAny(g_hAdminJoinSoundName, _, _, _, _, GetConVarFloat(g_hAdminJoinSoundVolume));
 			if(GetConVarInt(g_hAdminJoinSoundChatEnable))
 			{
 				for( new i = 1; i <= MaxClients; i++)
@@ -163,7 +163,15 @@ public Action:Command_StopSound(client, args)
 	{
 		if(IsClientValid(client))
 		{
-			StopSound(client, SNDCHAN_AUTO, g_hJoinSoundName);
+			if(GetEngineVersion() == Engine_CSS)
+			{
+				StopSound(client, SNDCHAN_AUTO, g_hJoinSoundName);
+			}
+			else if (GetEngineVersion() == Engine_CSGO)
+			{
+				// StopSound doesn't work in CSGO ?
+				EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, 0.0);
+			}
 		}
 	}
 }
@@ -174,7 +182,7 @@ public Action:Command_StartSound(client, args)
 	{
 		if(IsClientValid(client))
 		{
-			EmitSoundToClient(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
+			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
 			CreateTimer(5.0, Timer_Message, client);
 		}
 	}
