@@ -163,15 +163,7 @@ public Action:Command_StopSound(client, args)
 	{
 		if(IsClientValid(client))
 		{
-			if(GetEngineVersion() == Engine_CSS)
-			{
-				StopSound(client, SNDCHAN_AUTO, g_hJoinSoundName);
-			}
-			else if (GetEngineVersion() == Engine_CSGO)
-			{
-				// StopSound doesn't work in CSGO ?
-				EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, 0.0);
-			}
+			StopSoundAny(client, SNDCHAN_AUTO, g_hJoinSoundName);
 		}
 	}
 }
