@@ -4,10 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.3"
+			"Latest"	"1.0.4"
 		}
 		
 		"Notes"	"Added EmitSoundAny ( Thanks to Powerlord )"
+		"Notes"	"Added 2 new cvars ( joinsound_stop_message and joinsound_message_time)"
 	}
 	
 	"Files"
