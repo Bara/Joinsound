@@ -9,7 +9,7 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define JOINSOUND_VERSION "1.0.3"
+#define JOINSOUND_VERSION "1.0.4"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
@@ -18,10 +18,13 @@ new Handle:g_hJoinSoundStart = INVALID_HANDLE;
 new Handle:g_hJoinSoundStartCommand = INVALID_HANDLE;
 new String:g_sJoinSoundStartCommand[32];
 new Handle:g_hJoinSoundStop = INVALID_HANDLE;
+new Handle:g_hStopMessage = INVALID_HANDLE;
 new Handle:g_hJoinSoundStopCommand = INVALID_HANDLE;
 new String:g_sJoinSoundStopCommand[32];
 new Handle:g_hJoinSoundVolume = INVALID_HANDLE;
 new String:g_hJoinSoundName[PLATFORM_MAX_PATH];
+
+new Handle:g_hMessageTime = INVALID_HANDLE;
 
 new Handle:g_hAdminJoinSoundEnable = INVALID_HANDLE;
 new Handle:g_hAdminJoinSoundChatEnable = INVALID_HANDLE;
@@ -32,7 +35,7 @@ new String:g_hAdminJoinSoundName[PLATFORM_MAX_PATH];
 
 public Plugin:myinfo = 
 {
-	name = "Admin-/ Player-Joinsound",
+	name = "Admin / Player - Joinsound",
 	author = "Bara",
 	description = "Plays a custom joinsound if admin or player joins the server",
 	version = JOINSOUND_VERSION,
@@ -53,8 +56,11 @@ public OnPluginStart()
 	g_hJoinSoundStart = AutoExecConfig_CreateConVar("joinsound_start", "1", "Should '!start'-feature be enabled?", _, true, 0.0, true, 1.0);
 	g_hJoinSoundStartCommand = AutoExecConfig_CreateConVar("joinsound_start_command", "start", "Command for start function");
 	g_hJoinSoundStop = AutoExecConfig_CreateConVar("joinsound_stop", "1", "Should '!stop'-feature be enabled?", _, true, 0.0, true, 1.0);
+	g_hStopMessage = AutoExecConfig_CreateConVar("joinsound_stop_message", "1", "Send a message?", _, true, 0.0, true, 1.0);
 	g_hJoinSoundStopCommand = AutoExecConfig_CreateConVar("joinsound_stop_command", "stop", "Command for stop function");
 	g_hJoinSoundVolume = AutoExecConfig_CreateConVar("joinsound_volume", "1.0", "Volume of joinsound (1 = default)");
+
+	g_hMessageTime = AutoExecConfig_CreateConVar("joinsound_message_time", "5.0", "After how many seconds get a message after the beginning of the sound");
 
 	g_hAdminJoinSoundEnable = AutoExecConfig_CreateConVar("admin_joinsound_enable", "1", "Enable admin joinsound?", _, true, 0.0, true, 1.0);
 	g_hAdminJoinSoundChatEnable = AutoExecConfig_CreateConVar("admin_chat_enable", "1", "Enable admin joinmessage?", _, true, 0.0, true, 1.0);
@@ -103,7 +109,6 @@ public OnConfigsExecuted()
 	if(GetConVarInt(g_hJoinSoundStart))
 	{
 		decl String:sBuffer[32];
-
 		GetConVarString(g_hJoinSoundStartCommand, g_sJoinSoundStartCommand, sizeof(g_sJoinSoundStartCommand));
 		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStartCommand);
 		RegConsoleCmd(sBuffer, Command_StartSound);
@@ -112,7 +117,6 @@ public OnConfigsExecuted()
 	if(GetConVarInt(g_hJoinSoundStop))
 	{
 		decl String:sBuffer[32];
-
 		GetConVarString(g_hJoinSoundStopCommand, g_sJoinSoundStopCommand, sizeof(g_sJoinSoundStopCommand));
 		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStopCommand);
 		RegConsoleCmd(sBuffer, Command_StopSound);
@@ -126,7 +130,11 @@ public OnClientPostAdminCheck(client)
 		if(IsClientValid(client))
 		{
 			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
-			CreateTimer(5.0, Timer_Message, client);
+
+			if(GetConVarInt(g_hStopMessage))
+			{
+				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, client);
+			}
 		}
 	}
 
@@ -175,7 +183,11 @@ public Action:Command_StartSound(client, args)
 		if(IsClientValid(client))
 		{
 			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
-			CreateTimer(5.0, Timer_Message, client);
+			
+			if(GetConVarInt(g_hStopMessage))
+			{
+				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, client);
+			}
 		}
 	}
 }
