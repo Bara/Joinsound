@@ -2,25 +2,29 @@
 
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
+
+#include <multicolors>
 #include <emitsoundany>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
-#include <updater>
+#tryinclude <updater>
 
-#define JOINSOUND_VERSION "1.0.4"
+#define JOINSOUND_VERSION "1.0.5"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
 new Handle:g_hJoinSoundPath = INVALID_HANDLE;
+
 new Handle:g_hJoinSoundStart = INVALID_HANDLE;
 new Handle:g_hJoinSoundStartCommand = INVALID_HANDLE;
 new String:g_sJoinSoundStartCommand[32];
+
 new Handle:g_hJoinSoundStop = INVALID_HANDLE;
 new Handle:g_hStopMessage = INVALID_HANDLE;
 new Handle:g_hJoinSoundStopCommand = INVALID_HANDLE;
 new String:g_sJoinSoundStopCommand[32];
+
 new Handle:g_hJoinSoundVolume = INVALID_HANDLE;
 new String:g_hJoinSoundName[PLATFORM_MAX_PATH];
 
@@ -33,7 +37,7 @@ new Handle:g_hAdminJoinSoundVolume = INVALID_HANDLE;
 new String:g_hAdminJoinSoundName[PLATFORM_MAX_PATH];
 
 
-public Plugin:myinfo = 
+public Plugin:myinfo =
 {
 	name = "Admin / Player - Joinsound",
 	author = "Bara",
@@ -50,7 +54,7 @@ public OnPluginStart()
 
 	AutoExecConfig_SetFile("plugin.joinsound");
 	AutoExecConfig_SetCreateFile(true);
-	
+
 	g_hJoinSoundEnable = AutoExecConfig_CreateConVar("joinsound_enable", "1", "Enable joinsound?", _, true, 0.0, true, 1.0);
 	g_hJoinSoundPath = AutoExecConfig_CreateConVar("joinsound_path", "newsongformyserver/joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (JoinSound)");
 	g_hJoinSoundStart = AutoExecConfig_CreateConVar("joinsound_start", "1", "Should '!start'-feature be enabled?", _, true, 0.0, true, 1.0);
@@ -133,7 +137,7 @@ public OnClientPostAdminCheck(client)
 
 			if(GetConVarInt(g_hStopMessage))
 			{
-				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, client);
+				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, GetClientUserId(client));
 			}
 		}
 	}
@@ -157,8 +161,10 @@ public OnClientPostAdminCheck(client)
 	}
 }
 
-public Action:Timer_Message(Handle:timer, any:client)
+public Action:Timer_Message(Handle:timer, any:userid)
 {
+	new client = GetClientOfUserId(client);
+
 	if(IsClientValid(client))
 	{
 		CPrintToChat(client, "%T", "JoinStop", client, g_sJoinSoundStopCommand);
@@ -183,10 +189,10 @@ public Action:Command_StartSound(client, args)
 		if(IsClientValid(client))
 		{
 			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
-			
+
 			if(GetConVarInt(g_hStopMessage))
 			{
-				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, client);
+				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, GetClientUserId(client));
 			}
 		}
 	}

@@ -4,18 +4,18 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.4"
+			"Latest"	"1.0.5"
 		}
-		
-		"Notes"	"Added EmitSoundAny ( Thanks to Powerlord )"
-		"Notes"	"Added 2 new cvars ( joinsound_stop_message and joinsound_message_time)"
+
+		"Notes"	"Added Multi Colors"
+		"Notes"	"https://forums.alliedmods.net/showpost.php?p=2268941&postcount=13"
 	}
-	
+
 	"Files"
 	{
 		"Plugin"	"Path_SM/plugins/joinsound.smx"
 		"Plugin"	"Path_SM/translations/joinsound.phrases.txt"
-		
+
 		"Source"	"Path_SM/scripting/joinsound.sp"
 	}
 }
