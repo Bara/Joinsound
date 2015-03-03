@@ -7,7 +7,7 @@
 		"de"		"{green}[JoinSound] {lightgreen}Mit {green}!{1} {lightgreen}kannst Du den Join-Sound stoppen."
 		"pl"		"{green}[JoinSound] {lightgreen}Wpisz{green}!{1} {lightgreen}abywylaczyc joinsound."
 	}
-	
+
 	"AdminJoin"
 	{
 		"#format"	"{1:N}"

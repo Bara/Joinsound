@@ -10,7 +10,7 @@
 #undef REQUIRE_PLUGIN
 #tryinclude <updater>
 
-#define JOINSOUND_VERSION "1.0.6"
+#define JOINSOUND_VERSION "1.0.7"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
@@ -149,11 +149,11 @@ public OnClientPostAdminCheck(client)
 			EmitSoundToAllAny(g_hAdminJoinSoundName, _, _, _, _, GetConVarFloat(g_hAdminJoinSoundVolume));
 			if(GetConVarInt(g_hAdminJoinSoundChatEnable))
 			{
-				for( new i = 1; i <= MaxClients; i++)
+				for(new i = 1; i <= MaxClients; i++)
 				{
 					if(IsClientValid(i))
 					{
-						CPrintToChat(i, "%T", "AdminJoin", i);
+						CPrintToChat(i, "%T", "AdminJoin", i, client);
 					}
 				}
 			}
