@@ -4,10 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.5"
+			"Latest"	"1.0.6"
 		}
 
 		"Notes"	"Added Multi Colors"
+		"Notes"	"Bug fixed"
 		"Notes"	"https://forums.alliedmods.net/showpost.php?p=2268941&postcount=13"
 	}
 

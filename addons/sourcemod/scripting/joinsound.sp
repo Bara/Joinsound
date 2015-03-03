@@ -10,7 +10,7 @@
 #undef REQUIRE_PLUGIN
 #tryinclude <updater>
 
-#define JOINSOUND_VERSION "1.0.5"
+#define JOINSOUND_VERSION "1.0.6"
 #define UPDATE_URL "https://bara.in/update/joinsound.txt"
 
 new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
@@ -69,7 +69,7 @@ public OnPluginStart()
 	g_hAdminJoinSoundEnable = AutoExecConfig_CreateConVar("admin_joinsound_enable", "1", "Enable admin joinsound?", _, true, 0.0, true, 1.0);
 	g_hAdminJoinSoundChatEnable = AutoExecConfig_CreateConVar("admin_chat_enable", "1", "Enable admin joinmessage?", _, true, 0.0, true, 1.0);
 	g_hAdminJoinSoundPath = AutoExecConfig_CreateConVar("admin_joinsound_path", "newsongformyserver/admin_joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (AdminJoinSound)");
-	g_hJoinSoundVolume = AutoExecConfig_CreateConVar("admin_joinsound_volume", "1.0", "Volume of admin joinsound (1 = default)");
+	g_hAdminJoinSoundVolume = AutoExecConfig_CreateConVar("admin_joinsound_volume", "1.0", "Volume of admin joinsound (1 = default)");
 
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
