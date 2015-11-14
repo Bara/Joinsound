@@ -7,37 +7,37 @@
 #include <emitsoundany>
 #include <autoexecconfig>
 
-#undef REQUIRE_PLUGIN
-#tryinclude <updater>
+#pragma newdecls required
 
-#define JOINSOUND_VERSION "1.0.7"
-#define UPDATE_URL "https://bara.in/update/joinsound.txt"
+#define JOINSOUND_VERSION "2.0.0"
 
-new Handle:g_hJoinSoundEnable = INVALID_HANDLE;
-new Handle:g_hJoinSoundPath = INVALID_HANDLE;
+ConVar g_cJoinSoundEnable = null;
+ConVar g_cJoinSoundPath = null;
 
-new Handle:g_hJoinSoundStart = INVALID_HANDLE;
-new Handle:g_hJoinSoundStartCommand = INVALID_HANDLE;
-new String:g_sJoinSoundStartCommand[32];
+ConVar g_cJoinSoundStart = null;
+ConVar g_cJoinSoundStartCommand = null;
+char g_sJoinSoundStartCommand[32];
 
-new Handle:g_hJoinSoundStop = INVALID_HANDLE;
-new Handle:g_hStopMessage = INVALID_HANDLE;
-new Handle:g_hJoinSoundStopCommand = INVALID_HANDLE;
-new String:g_sJoinSoundStopCommand[32];
+ConVar g_cJoinSoundStop = null;
+ConVar g_cStopMessage = null;
+ConVar g_cJoinSoundStopCommand = null;
+char g_sJoinSoundStopCommand[32];
 
-new Handle:g_hJoinSoundVolume = INVALID_HANDLE;
-new String:g_hJoinSoundName[PLATFORM_MAX_PATH];
+ConVar g_cJoinSoundVolume = null;
+char g_sJoinSoundName[PLATFORM_MAX_PATH];
 
-new Handle:g_hMessageTime = INVALID_HANDLE;
+ConVar g_cMessageTime = null;
 
-new Handle:g_hAdminJoinSoundEnable = INVALID_HANDLE;
-new Handle:g_hAdminJoinSoundChatEnable = INVALID_HANDLE;
-new Handle:g_hAdminJoinSoundPath = INVALID_HANDLE;
-new Handle:g_hAdminJoinSoundVolume = INVALID_HANDLE;
-new String:g_hAdminJoinSoundName[PLATFORM_MAX_PATH];
+ConVar g_cAdminJoinSoundEnable = null;
+ConVar g_cAdminJoinSoundChatEnable = null;
+ConVar g_cAdminJoinSoundPath = null;
+ConVar g_cAdminJoinSoundVolume = null;
+char g_sAdminJoinSoundName[PLATFORM_MAX_PATH];
+ConVar g_cAdminJoinSoundFlag = null;
+char g_sAdminJoinSoundFlag[16];
 
 
-public Plugin:myinfo =
+public Plugin myinfo =
 {
 	name = "Admin / Player - Joinsound",
 	author = "Bara",
@@ -46,7 +46,7 @@ public Plugin:myinfo =
 	url = "www.bara.in"
 };
 
-public OnPluginStart()
+public void OnPluginStart()
 {
 	CreateConVar("admin-joinsound_version", JOINSOUND_VERSION, "Joinsound", FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
@@ -55,154 +55,146 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("plugin.joinsound");
 	AutoExecConfig_SetCreateFile(true);
 
-	g_hJoinSoundEnable = AutoExecConfig_CreateConVar("joinsound_enable", "1", "Enable joinsound?", _, true, 0.0, true, 1.0);
-	g_hJoinSoundPath = AutoExecConfig_CreateConVar("joinsound_path", "newsongformyserver/joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (JoinSound)");
-	g_hJoinSoundStart = AutoExecConfig_CreateConVar("joinsound_start", "1", "Should '!start'-feature be enabled?", _, true, 0.0, true, 1.0);
-	g_hJoinSoundStartCommand = AutoExecConfig_CreateConVar("joinsound_start_command", "start", "Command for start function");
-	g_hJoinSoundStop = AutoExecConfig_CreateConVar("joinsound_stop", "1", "Should '!stop'-feature be enabled?", _, true, 0.0, true, 1.0);
-	g_hStopMessage = AutoExecConfig_CreateConVar("joinsound_stop_message", "1", "Send a message?", _, true, 0.0, true, 1.0);
-	g_hJoinSoundStopCommand = AutoExecConfig_CreateConVar("joinsound_stop_command", "stop", "Command for stop function");
-	g_hJoinSoundVolume = AutoExecConfig_CreateConVar("joinsound_volume", "1.0", "Volume of joinsound (1 = default)");
+	g_cJoinSoundEnable = AutoExecConfig_CreateConVar("joinsound_enable", "1", "Enable joinsound?", _, true, 0.0, true, 1.0);
+	g_cJoinSoundPath = AutoExecConfig_CreateConVar("joinsound_path", "newsongformyserver/joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (JoinSound)");
+	g_cJoinSoundStart = AutoExecConfig_CreateConVar("joinsound_start", "1", "Should '!start'-feature be enabled?", _, true, 0.0, true, 1.0);
+	g_cJoinSoundStartCommand = AutoExecConfig_CreateConVar("joinsound_start_command", "start", "Command for start function");
+	g_cJoinSoundStop = AutoExecConfig_CreateConVar("joinsound_stop", "1", "Should '!stop'-feature be enabled?", _, true, 0.0, true, 1.0);
+	g_cStopMessage = AutoExecConfig_CreateConVar("joinsound_stop_message", "1", "Send a message?", _, true, 0.0, true, 1.0);
+	g_cJoinSoundStopCommand = AutoExecConfig_CreateConVar("joinsound_stop_command", "stop", "Command for stop function");
+	g_cJoinSoundVolume = AutoExecConfig_CreateConVar("joinsound_volume", "1.0", "Volume of joinsound (1 = default)");
 
-	g_hMessageTime = AutoExecConfig_CreateConVar("joinsound_message_time", "5.0", "After how many seconds get a message after the beginning of the sound");
+	g_cMessageTime = AutoExecConfig_CreateConVar("joinsound_message_time", "5.0", "After how many seconds get a message after the beginning of the sound");
 
-	g_hAdminJoinSoundEnable = AutoExecConfig_CreateConVar("admin_joinsound_enable", "1", "Enable admin joinsound?", _, true, 0.0, true, 1.0);
-	g_hAdminJoinSoundChatEnable = AutoExecConfig_CreateConVar("admin_chat_enable", "1", "Enable admin joinmessage?", _, true, 0.0, true, 1.0);
-	g_hAdminJoinSoundPath = AutoExecConfig_CreateConVar("admin_joinsound_path", "newsongformyserver/admin_joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (AdminJoinSound)");
-	g_hAdminJoinSoundVolume = AutoExecConfig_CreateConVar("admin_joinsound_volume", "1.0", "Volume of admin joinsound (1 = default)");
+	g_cAdminJoinSoundEnable = AutoExecConfig_CreateConVar("admin_joinsound_enable", "1", "Enable admin joinsound?", _, true, 0.0, true, 1.0);
+	g_cAdminJoinSoundChatEnable = AutoExecConfig_CreateConVar("admin_chat_enable", "1", "Enable admin joinmessage?", _, true, 0.0, true, 1.0);
+	g_cAdminJoinSoundPath = AutoExecConfig_CreateConVar("admin_joinsound_path", "newsongformyserver/admin_joinsound.mp3", "Which file sould be played? Path after cstrike/sound/ (AdminJoinSound)");
+	g_cAdminJoinSoundVolume = AutoExecConfig_CreateConVar("admin_joinsound_volume", "1.0", "Volume of admin joinsound (1 = default)");
+	g_cAdminJoinSoundFlag = AutoExecConfig_CreateConVar("admin_joinsound_flag", "b", "Admin flags for admin join sound (b = default)");
 
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
-
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
 }
 
-public OnLibraryAdded(const String:name[])
+public void OnConfigsExecuted()
 {
-	if (StrEqual(name, "updater"))
+	char sBuffer[PLATFORM_MAX_PATH];
+	
+	if(g_cJoinSoundEnable.IntValue)
 	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
-public OnConfigsExecuted()
-{
-	if(GetConVarInt(g_hJoinSoundEnable))
-	{
-		GetConVarString(g_hJoinSoundPath, g_hJoinSoundName, PLATFORM_MAX_PATH);
-		PrecacheSoundAny(g_hJoinSoundName, true);
-
-		decl String:sBuffer[PLATFORM_MAX_PATH];
-		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_hJoinSoundName);
+		g_cJoinSoundPath.GetString(g_sJoinSoundName, PLATFORM_MAX_PATH);
+		PrecacheSoundAny(g_sJoinSoundName, true);
+		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_sJoinSoundName);
 		AddFileToDownloadsTable(sBuffer);
 	}
 
-	if(GetConVarInt(g_hAdminJoinSoundEnable))
+	if(g_cAdminJoinSoundEnable.IntValue)
 	{
-		GetConVarString(g_hAdminJoinSoundPath, g_hAdminJoinSoundName, PLATFORM_MAX_PATH);
-		PrecacheSoundAny(g_hAdminJoinSoundName, true);
-
-		decl String:sBuffer[PLATFORM_MAX_PATH];
-		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_hAdminJoinSoundName);
+		g_cAdminJoinSoundPath.GetString(g_sAdminJoinSoundName, PLATFORM_MAX_PATH);
+		PrecacheSoundAny(g_sAdminJoinSoundName, true);
+		Format(sBuffer, sizeof(sBuffer), "sound/%s", g_sAdminJoinSoundName);
 		AddFileToDownloadsTable(sBuffer);
 	}
 
-	if(GetConVarInt(g_hJoinSoundStart))
+	if(g_cJoinSoundStart.IntValue)
 	{
-		decl String:sBuffer[32];
-		GetConVarString(g_hJoinSoundStartCommand, g_sJoinSoundStartCommand, sizeof(g_sJoinSoundStartCommand));
+		g_cJoinSoundStartCommand.GetString(g_sJoinSoundStartCommand, sizeof(g_sJoinSoundStartCommand));
 		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStartCommand);
 		RegConsoleCmd(sBuffer, Command_StartSound);
 	}
 
-	if(GetConVarInt(g_hJoinSoundStop))
+	if(g_cJoinSoundStop.IntValue)
 	{
-		decl String:sBuffer[32];
-		GetConVarString(g_hJoinSoundStopCommand, g_sJoinSoundStopCommand, sizeof(g_sJoinSoundStopCommand));
+		g_cJoinSoundStopCommand.GetString(g_sJoinSoundStopCommand, sizeof(g_sJoinSoundStopCommand));
 		Format(sBuffer, sizeof(sBuffer), "sm_%s", g_sJoinSoundStopCommand);
 		RegConsoleCmd(sBuffer, Command_StopSound);
 	}
+	
+	if(g_cAdminJoinSoundEnable.IntValue)
+		g_cAdminJoinSoundFlag.GetString(g_sAdminJoinSoundFlag, sizeof(g_sAdminJoinSoundFlag));
 }
 
-public OnClientPostAdminCheck(client)
+public void OnClientPostAdminCheck(int client)
 {
-	if(GetConVarInt(g_hJoinSoundEnable))
+	if(g_cJoinSoundEnable.IntValue)
 	{
 		if(IsClientValid(client))
 		{
-			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
+			EmitSoundToClientAny(client, g_sJoinSoundName, _, _, _, _, g_cJoinSoundVolume.FloatValue);
 
-			if(GetConVarInt(g_hStopMessage))
-			{
-				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, GetClientUserId(client));
-			}
+			if(g_cStopMessage.IntValue)
+				CreateTimer(g_cMessageTime.FloatValue, Timer_Message, GetClientUserId(client));
 		}
 	}
 
-	if(GetConVarInt(g_hAdminJoinSoundEnable))
+	if(g_cAdminJoinSoundEnable.IntValue)
 	{
-		if(IsClientValid(client) && GetUserAdmin(client) != INVALID_ADMIN_ID)
+		if(IsClientValid(client))
 		{
-			EmitSoundToAllAny(g_hAdminJoinSoundName, _, _, _, _, GetConVarFloat(g_hAdminJoinSoundVolume));
-			if(GetConVarInt(g_hAdminJoinSoundChatEnable))
+			AdminFlag aFlags[16];
+			FlagBitsToArray(ReadFlagString(g_sAdminJoinSoundFlag), aFlags, sizeof(aFlags));
+			
+			if(HasFlags(client, aFlags))
 			{
-				for(new i = 1; i <= MaxClients; i++)
-				{
-					if(IsClientValid(i))
-					{
-						CPrintToChat(i, "%T", "AdminJoin", i, client);
-					}
-				}
+				EmitSoundToAllAny(g_sAdminJoinSoundName, _, _, _, _, g_cAdminJoinSoundVolume.FloatValue);
+				
+				if(g_cAdminJoinSoundChatEnable.IntValue)
+					for(int i = 1; i <= MaxClients; i++)
+						if(IsClientValid(i))
+							CPrintToChat(i, "%T", "AdminJoin", i, client);
 			}
 		}
 	}
 }
 
-public Action:Timer_Message(Handle:timer, any:userid)
+public Action Timer_Message(Handle timer, any userid)
 {
-	new client = GetClientOfUserId(client);
+	int client = GetClientOfUserId(client);
 
 	if(IsClientValid(client))
-	{
 		CPrintToChat(client, "%T", "JoinStop", client, g_sJoinSoundStopCommand);
-	}
 }
 
-public Action:Command_StopSound(client, args)
+public Action Command_StopSound(int client, int args)
 {
-	if(GetConVarInt(g_hJoinSoundEnable) && GetConVarInt(g_hJoinSoundStop))
+	if(g_cJoinSoundEnable.IntValue && g_cJoinSoundStop.IntValue)
+		if(IsClientValid(client))
+			StopSoundAny(client, SNDCHAN_AUTO, g_sJoinSoundName);
+}
+
+public Action Command_StartSound(int client, int args)
+{
+	if(g_cJoinSoundEnable.IntValue && g_cJoinSoundStart.IntValue)
 	{
 		if(IsClientValid(client))
 		{
-			StopSoundAny(client, SNDCHAN_AUTO, g_hJoinSoundName);
-		}
-	}
-}
+			EmitSoundToClientAny(client, g_sJoinSoundName, _, _, _, _, g_cJoinSoundVolume.FloatValue);
 
-public Action:Command_StartSound(client, args)
-{
-	if(GetConVarInt(g_hJoinSoundEnable) && GetConVarInt(g_hJoinSoundStart))
-	{
-		if(IsClientValid(client))
-		{
-			EmitSoundToClientAny(client, g_hJoinSoundName, _, _, _, _, GetConVarFloat(g_hJoinSoundVolume));
-
-			if(GetConVarInt(g_hStopMessage))
+			if(g_cStopMessage.IntValue)
 			{
-				CreateTimer(GetConVarFloat(g_hMessageTime), Timer_Message, GetClientUserId(client));
+				CreateTimer(g_cMessageTime.FloatValue, Timer_Message, GetClientUserId(client));
 			}
 		}
 	}
 }
 
-stock bool:IsClientValid(client)
+stock bool IsClientValid(int client)
 {
 	if(client > 0 && client <= MaxClients && IsClientInGame(client))
-	{
 		return true;
-	}
+	return false;
+}
+
+stock bool HasFlags(int client, AdminFlag flags[16])
+{
+	int iFlags = GetUserFlagBits(client);
+	
+	if(iFlags & ADMFLAG_ROOT)
+		return true;
+	
+	for(int i = 0; i < sizeof(flags); i++)
+		if(iFlags & FlagToBit(flags[i]))
+			return true;
+	
 	return false;
 }
