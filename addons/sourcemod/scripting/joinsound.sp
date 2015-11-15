@@ -188,10 +188,7 @@ stock bool IsClientValid(int client)
 stock bool HasFlags(int client, AdminFlag flags[16])
 {
 	int iFlags = GetUserFlagBits(client);
-	
-	if(iFlags & ADMFLAG_ROOT)
-		return true;
-	
+
 	for(int i = 0; i < sizeof(flags); i++)
 		if(iFlags & FlagToBit(flags[i]))
 			return true;
