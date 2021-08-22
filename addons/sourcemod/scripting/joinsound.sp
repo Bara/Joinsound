@@ -149,7 +149,7 @@ public void OnClientPostAdminCheck(int client)
 
 public Action Timer_Message(Handle timer, any userid)
 {
-	int client = GetClientOfUserId(client);
+	int client = GetClientOfUserId(userid);
 
 	if(IsClientValid(client))
 		CPrintToChat(client, "%T", "JoinStop", client, g_sJoinSoundStopCommand);
