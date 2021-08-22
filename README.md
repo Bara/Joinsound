@@ -1,7 +1,9 @@
 Joinsound
 ============
 
-[![Alt text](https://travis-ci.org/Bara20/Joinsound.svg?branch=master)](https://travis-ci.org/Bara20/Joinsound)
+| Action Status | Discord |
+|:-------------:|:-------:|
+| [![Action Status](https://github.com/Bara/Joinsound/workflows/Compile%20with%20SourceMod/badge.svg)](https://github.com/Bara/Joinsound/actions) | [![Discord](https://img.shields.io/discord/388685157286019072.svg)](https://discord.gg/NUMQfgs) |
 
 SourceMod Plugin for CSS and CSGO
 https://forums.alliedmods.net/showthread.php?t=238970
