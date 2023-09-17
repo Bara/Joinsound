@@ -111,7 +111,9 @@ public void OnConfigsExecuted()
 	}
 	
 	if(g_cAdminJoinSoundEnable.IntValue)
+	{
 		g_cAdminJoinSoundFlag.GetString(g_sAdminJoinSoundFlag, sizeof(g_sAdminJoinSoundFlag));
+	}
 }
 
 public void OnClientPostAdminCheck(int client)
@@ -123,7 +125,9 @@ public void OnClientPostAdminCheck(int client)
 			EmitSoundToClientAny(client, g_sJoinSoundName, _, _, _, _, g_cJoinSoundVolume.FloatValue);
 
 			if(g_cStopMessage.IntValue)
+			{
 				CreateTimer(g_cMessageTime.FloatValue, Timer_Message, GetClientUserId(client));
+			}
 		}
 	}
 
@@ -139,9 +143,15 @@ public void OnClientPostAdminCheck(int client)
 				EmitSoundToAllAny(g_sAdminJoinSoundName, _, _, _, _, g_cAdminJoinSoundVolume.FloatValue);
 				
 				if(g_cAdminJoinSoundChatEnable.IntValue)
+				{
 					for(int i = 1; i <= MaxClients; i++)
+					{
 						if(IsClientValid(i))
+						{
 							CPrintToChat(i, "%T", "AdminJoin", i, client);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -152,14 +162,24 @@ public Action Timer_Message(Handle timer, any userid)
 	int client = GetClientOfUserId(userid);
 
 	if(IsClientValid(client))
+	{
 		CPrintToChat(client, "%T", "JoinStop", client, g_sJoinSoundStopCommand);
+	}
+
+	return Plugin_Handled;
 }
 
 public Action Command_StopSound(int client, int args)
 {
 	if(g_cJoinSoundEnable.IntValue && g_cJoinSoundStop.IntValue)
+	{
 		if(IsClientValid(client))
+		{
 			StopSoundAny(client, SNDCHAN_AUTO, g_sJoinSoundName);
+		}
+	}
+
+	return Plugin_Handled;
 }
 
 public Action Command_StartSound(int client, int args)
@@ -176,12 +196,17 @@ public Action Command_StartSound(int client, int args)
 			}
 		}
 	}
+
+	return Plugin_Handled;
 }
 
 stock bool IsClientValid(int client)
 {
 	if(client > 0 && client <= MaxClients && IsClientInGame(client))
+	{
 		return true;
+	}
+
 	return false;
 }
 
@@ -190,8 +215,12 @@ stock bool HasFlags(int client, AdminFlag flags[16])
 	int iFlags = GetUserFlagBits(client);
 
 	for(int i = 0; i < sizeof(flags); i++)
+	{
 		if(iFlags & FlagToBit(flags[i]))
+		{
 			return true;
+		}
+	}
 	
 	return false;
 }
